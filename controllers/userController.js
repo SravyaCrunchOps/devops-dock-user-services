@@ -78,8 +78,29 @@ const userInfo = async (req, res) => {
     })
 }
 
+const updateUser = async (req, res) => {
+    const reqEmail = req.query.email;
+    const reqData = req.body;
+    let hashPassword, update;
+    if(reqData.password) {
+        hashPassword = bcrypt.hashSync(reqData.password, 8)
+        update = {
+            displayName: reqData.displayName,
+            password: hashPassword
+        }
+    } else {
+        update = {
+            displayName: reqData.displayName,
+        }
+    }
+
+    const user = await User.findOneAndUpdate({email: reqEmail}, update, {new: true})
+    return res.status(200).json({message: "updated your profile", result: user})
+}
+
 module.exports = {
     signup: signup,
     login: login,
     userInfo: userInfo,
+    updateUser: updateUser
 }
