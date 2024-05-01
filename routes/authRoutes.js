@@ -1,6 +1,7 @@
 const express = require('express');
 const passport = require('passport');
 const config = require('../config');
+const logger = require('../logger/logger');
 
 const route = express.Router();
 
@@ -13,6 +14,7 @@ route.get("/login/failed", (req, res) => {
 
 route.get("/login/success", (req, res) => {
     if(req.user) {
+        logger.info("User logged in successfully")
         res.status(200).json({
             success: true,
             message: "successful",

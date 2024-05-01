@@ -20,6 +20,9 @@ const config = {
     },
     urls: {
         baseUrl: process.env.BASE_URL
+    },
+    start: {
+        // "start": "node --require ./tracing.js index.js",
     }
 }
 
