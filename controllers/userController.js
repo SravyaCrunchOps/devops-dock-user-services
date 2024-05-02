@@ -29,7 +29,7 @@ const signup = async (req, res) => {
     });
     await user.save();
     // logging
-    // logger.info({message: "User registered successfully")
+    logger.info({meta: {information: "User registered successfully", username: req.body.displayName, email: req.body.email}})
     return res.status(200).json({
         message: "Registered Successfully",
         success: true
@@ -42,7 +42,7 @@ const login = async(req, res) => {
         const comparePassword = await bcrypt.compareSync(req.body.password, existingUser.password);
         if(comparePassword) {
             const user_token = jwt.sign({id: existingUser._id}, config.secrets.jwt_key, {expiresIn: 84600});
-            // logger.info("User logged in successfully")
+            logger.info({meta: {information: "User logged in successfully", email: req.body.email}})
             return res.status(200).json({
                 message: "Logged in successfully",
                 token: user_token,
@@ -67,6 +67,7 @@ const login = async(req, res) => {
 const userInfo = async (req, res) => {
     const token = req.headers['x-access-token'];
     if(!token) {
+        logger.warn('No token is generated')
         return res.status(403).json({
             message: "Invalid user credential",
             auth: false
@@ -74,6 +75,7 @@ const userInfo = async (req, res) => {
     }
     jwt.verify(token, config.secrets.jwt_key, (err, result) => {
         if(err) { 
+            logger.error("Invalid user credentials")
             return res.status(403).json({
                 message: "Invalid user credential",
                 auth: false
@@ -81,7 +83,7 @@ const userInfo = async (req, res) => {
         }
         User.findOne({_id: new ObjectId(result.id)})
             .then(result => {
-                // logger.info({message: 'User details sent to client'})
+                logger.info({message: 'User details sent to client'})
                 res.status(200).json({result})
             })  
     })

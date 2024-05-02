@@ -6,9 +6,10 @@ const passport = require('passport');
 const config = require('./config');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
-const morganMiddleware = require('./middlewares/morganMiddleware');
-const { logger, errLogger } = require('./logger/expressWinston');
-
+// const morgan = require('./middlewares/morgan');
+// const { logger, errLogger } = require('./logger/expressWinston');
+const logger = require('./logger/logger');
+// const morgan = require('morgan');
 const port = config.server.port;
 
 require('./middlewares/passport');
@@ -44,13 +45,24 @@ app.use(cors({
 }));
 
 // route handler
-app.use(logger);
-app.use(morganMiddleware);
+// morgan.token('meta', (req, res) => {
+//         return JSON.stringify({
+//             meta: {
+//                 meta: req.body? req.body.meta : null,
+//                 information: req.body ? req.body.message : null,
+//                 email: req.body ? req.body.email : null
+//             }
+//         })
+// })
+// app.use(morgan(':remote-addr :remote-user [:date[clf]] ":method - HTTP/:http-version :url" :status - :res[content-length] :meta - :response-time ms :referrer'))
+app.use((req, res, next) => {
+    logger.info(req.originalUrl)
+    next()
+})
 
 app.use('/auth', authRoutes);
 app.use('/user', userRoutes);
 
-app.use(errLogger);
 
 // database and port handler
 if(db) {
